@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Queen of Hearts - Audio Book</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #13111A;
+            color: white;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .back-button {
+            color: white;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .toggle-button {
+            background: #7B5EAE;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s ease;
+        }
+
+        .toggle-button:hover {
+            background: #8B6EBE;
+        }
+
+        .cover-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 100%;
+            margin-bottom: 20px;
+        }
+
+        .cover {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #4B3F8D, #7B5EAE);
+            border-radius: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .settings-panel {
+            background: #1E1B24;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .settings-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 12px;
+        }
+
+        .settings-row:last-child {
+            margin-bottom: 0;
+        }
+
+        select, input[type="range"] {
+            flex: 1;
+            background: #13111A;
+            color: white;
+            padding: 8px;
+            border: none;
+            border-radius: 6px;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        label {
+            min-width: 80px;
+            color: #A9A6B3;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .author {
+            color: #A9A6B3;
+            font-size: 16px;
+            margin-bottom: 24px;
+        }
+
+        .description {
+            color: #A9A6B3;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 32px;
+            transition: opacity 0.3s ease;
+        }
+
+        .progress-container {
+            margin-bottom: 24px;
+        }
+
+        .progress {
+            width: 100%;
+            -webkit-appearance: none;
+            height: 4px;
+            background: #1E1B24;
+            border-radius: 2px;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .progress::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: #7B5EAE;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .time {
+            display: flex;
+            justify-content: space-between;
+            color: #A9A6B3;
+            font-size: 12px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 32px;
+            margin-bottom: 48px;
+            background: #1E1B24;
+            padding: 16px;
+            border-radius: 12px;
+        }
+
+        .control-button {
+            background: none;
+            border: none;
+            color: #A9A6B3;
+            font-size: 16px;
+            cursor: pointer;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .control-button:hover {
+            color: white;
+        }
+
+        .play-button {
+            background: #7B5EAE;
+            border-radius: 50%;
+            width: 64px;
+            height: 64px;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .play-button:hover {
+            background: #8B6EBE;
+        }
+
+        .error-message {
+            color: #ff4444;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 16px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="back-button">←</button>
+            <button class="toggle-button" id="toggleButton">Hide Text</button>
+        </div>
+
+        <div class="cover-container">
+            <div class="cover">
+                <h1>The Queen of Hearts</h1>
+            </div>
+        </div>
+
+        <div class="settings-panel">
+            <div class="settings-row">
+                <label for="voiceSelect">Voice:</label>
+                <select id="voiceSelect">
+                    <option value="">Select a Voice</option>
+                </select>
+            </div>
+            <div class="settings-row">
+                <label for="rate">Rate:</label>
+                <input type="range" id="rate" min="0.5" max="1.5" value="1" step="0.1">
+            </div>
+            <div class="settings-row">
+                <label for="pitch">Pitch:</label>
+                <input type="range" id="pitch" min="0.5" max="2" value="1" step="0.1">
+            </div>
+        </div>
+
+        <div class="content">
+            <h2 class="title">The Queen of Hearts</h2>
+            <p class="author">Emma Colley</p>
+            <p class="description" id="audioText">
+                Building a profitable Software as a Service (SaaS) business is one of the most promising ways to earn money in the digital era. The SaaS model offers customers access to software via the internet, typically on a subscription basis. This eliminates the need for users to install or maintain software on their devices and allows SaaS providers to earn recurring revenue. If you’re looking to make money with SaaS, the journey starts with identifying a specific problem that people or businesses face. Your software should provide a solution that is both effective and user-friendly. Choosing the right niche is critical. Think about industries or areas where people are spending time, energy, or money on tasks that could be automated or simplified. For instance, you might focus on tools for project management, invoicing, team collaboration, customer support, marketing, or any other area where efficiency can be improved. Research is essential here. Speak with potential users, analyze competitors, and look for gaps in the market that your product can fill. The more pressing the problem, the more likely people will be willing to pay for your solution.
+
+                Once you have identified your niche, it’s time to develop your idea into a tangible product. Start with a Minimum Viable Product (MVP)—a basic version of your software that includes only the most essential features. An MVP allows you to test the market and get feedback from early users without investing too much time and money upfront. It’s easy to get caught up in adding features, but simplicity is often better. A product with fewer features but high usability and effectiveness will usually win over something bloated and confusing. Development is the next step, and there are multiple ways to approach it. If you have programming skills, you can build the product yourself. If not, you can hire developers or outsource the work to a software development agency. In either case, focus on creating a high-quality product. Your software must be reliable, secure, and scalable to accommodate future growth. Testing is also critical. Ensure the product works seamlessly on different devices and platforms, as a glitchy or slow application can deter potential customers.
+                
+                Once your product is ready, you need to decide on a pricing model. Most SaaS businesses rely on a subscription-based model, where users pay monthly or annually for access to the software. Within this framework, offering multiple pricing tiers is a common and effective strategy. For example, you might have a basic plan for individual users, a standard plan for small teams, and a premium plan for larger organizations. Each tier can include progressively more features and benefits, allowing you to cater to different customer segments. Another option is to offer a freemium model, where users can access basic features for free but must pay for advanced functionality. This strategy can help you attract a large user base quickly, as many people are more willing to try a free service than commit to a paid one. However, you’ll need to ensure that your premium features are compelling enough to convert free users into paying customers.
+                
+                At this point, marketing becomes crucial. You can have the best product in the world, but if no one knows about it, you won’t make any money. Start by building a professional website that clearly explains what your software does, who it’s for, and how it benefits users. Include clear pricing information, a way to sign up, and testimonials or case studies if you have them. Your website should also be optimized for search engines (SEO) so that potential customers can easily find you online. Beyond your website, digital marketing will help you reach your target audience. Pay-per-click (PPC) advertising, social media marketing, email campaigns, and content marketing are all effective ways to drive traffic to your site. Content marketing, in particular, can help you establish authority in your niche. By creating blog posts, videos, webinars, or guides that solve problems for your audience, you can attract potential customers while building trust in your brand. Don’t underestimate the power of partnerships and word-of-mouth marketing. Collaborating with complementary businesses or influencers in your industry can expose your product to a broader audience. Similarly, satisfied customers can become your best marketers by recommending your software to others.
+                
+                Customer retention is just as important as acquiring new users. In a subscription-based model, losing customers (churn) can significantly impact your revenue. To minimize churn, focus on delivering an excellent customer experience. This includes providing responsive and helpful customer support, regularly updating your software with new features or improvements, and actively seeking feedback to understand and address user needs. Building a community around your product can also help with retention. For example, you could create forums, social media groups, or newsletters to keep users engaged and connected to your brand. Once you’ve established a stable user base, scaling your SaaS business becomes the next priority. One way to scale is by automating processes such as billing, customer onboarding, and email marketing. This frees up your time to focus on growth strategies. Another approach is to expand your product offering. For example, you could introduce additional features, add-ons, or integrations with other software. Offering enterprise solutions tailored to large organizations can also be a lucrative avenue, as these clients are often willing to pay a premium for customization and dedicated support.
+                
+                Expanding into new markets is another way to scale. If your SaaS product is currently targeting a specific region, consider adapting it for international audiences. This might involve translating your software into other languages or adjusting pricing to suit different currencies. Scaling doesn’t just mean acquiring new customers; it also means maximizing revenue from existing ones. Upselling and cross-selling can help you achieve this. For instance, you might offer an analytics add-on, premium customer support, or advanced customization options. These additional revenue streams can significantly boost your bottom line without requiring you to find new customers. To ensure long-term success, keep an eye on your competitors and industry trends. SaaS is a dynamic field, and staying ahead often requires continuous learning and adaptation. This could mean adopting new technologies, entering emerging markets, or rethinking your pricing strategy based on changing customer needs. Running a SaaS business also comes with challenges, such as managing server costs, ensuring data security, and complying with legal and regulatory requirements. However, these challenges are manageable with careful planning and execution.
+                
+                In conclusion, making money with SaaS involves a combination of solving a real problem, creating a high-quality product, and effectively marketing and scaling your business. By focusing on customer needs, building a strong brand, and continuously improving your offering, you can create a SaaS product that generates consistent revenue. While the journey requires time, effort, and investment, the potential rewards are substantial. SaaS businesses often enjoy recurring revenue, high profit margins, and the ability to reach customers worldwide, making it an attractive option for aspiring entrepreneurs. With the right strategy and determination, you can turn your SaaS idea into a successful and profitable business.
+            </p>
+        </div>
+
+        <div class="progress-container">
+            <input type="range" class="progress" id="progress" min="0" max="100" value="0">
+            <div class="time">
+                <span id="currentTime">0:00</span>
+                <span id="duration">-:--</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="control-button" id="prevButton">Prev</button>
+            <button class="control-button" id="rewindButton">-10s</button>
+            <button class="control-button play-button" id="playPauseButton">Play</button>
+            <button class="control-button" id="forwardButton">+10s</button>
+            <button class="control-button" id="nextButton">Next</button>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+    </div>
+
+    <script>
+        class AudioPlayer {
+            constructor() {
+                this.initializeElements();
+                this.initializeState();
+                this.setupEventListeners();
+                this.loadVoices();
+            }
+
+            initializeElements() {
+                this.audioText = document.getElementById('audioText').textContent;
+                this.progress = document.getElementById('progress');
+                this.currentTimeDisplay = document.getElementById('currentTime');
+                this.durationDisplay = document.getElementById('duration');
+                this.playPauseButton = document.getElementById('playPauseButton');
+                this.prevButton = document.getElementById('prevButton');
+                this.nextButton = document.getElementById('nextButton');
+                this.rewindButton = document.getElementById('rewindButton');
+                this.forwardButton = document.getElementById('forwardButton');
+                this.errorMessage = document.getElementById('errorMessage');
+                this.toggleButton = document.getElementById('toggleButton');
+                this.audioTextElement = document.getElementById('audioText');
+                this.voiceSelect = document.getElementById('voiceSelect');
+                this.rateInput = document.getElementById('rate');
+                this.pitchInput = document.getElementById('pitch');
+            }
+
+            initializeState() {
+                this.utterance = null;
+                this.isPlaying = false;
+                this.startTime = 0;
+                this.elapsedTime = 0;
+                this.totalDuration = 0;
+                this.seekTime = 0;
+                this.animationFrameId = null;
+                this.isTextVisible = true;
+            }
+
+            loadVoices() {
+                const voices = window.speechSynthesis.getVoices();
+                if (voices.length === 0) {
+                    window.speechSynthesis.onvoiceschanged = () => this.loadVoices();
+                    return;
+                }
+
+                this.voiceSelect.innerHTML = "<option value=''>Select a Voice</option>";
+                voices.forEach(voice => {
+                    const option = document.createElement('option');
+                    option.value = voice.name;
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    this.voiceSelect.appendChild(option);
+                    
+                    // Set "Microsoft Liam Online (Natural) - English (Canada)" as the default if available
+                    if (voice.name === "Microsoft Liam Online (Natural) - English (Canada)") {
+                        option.selected = true;
+                    }
+                });
+            }
+
+            setupEventListeners() {
+                this.playPauseButton.addEventListener('click', () => this.togglePlayPause());
+                this.toggleButton.addEventListener('click', () => this.toggleTextVisibility());
+                this.voiceSelect.addEventListener('change', () => this.updateVoice());
+                this.rateInput.addEventListener('change', () => this.updateRate());
+                this.pitchInput.addEventListener('change', () => this.updatePitch());
+                this.rewindButton.addEventListener('click', () => this.rewind());
+                this.forwardButton.addEventListener('click', () => this.forward());
+            }
+
+            createUtterance() {
+                this.stop();
+                this.utterance = new SpeechSynthesisUtterance(this.audioText);
+                
+                // Set voice
+                const voices = window.speechSynthesis.getVoices();
+                const selectedVoice = voices.find(voice => voice.name === this.voiceSelect.value);
+                this.utterance.voice = selectedVoice || voices[0];
+
+                // Set rate and pitch
+                this.utterance.rate = parseFloat(this.rateInput.value);
+                this.utterance.pitch = parseFloat(this.pitchInput.value);
+
+                this.setupUtteranceEvents();
+            }
+
+            setupUtteranceEvents() {
+                this.utterance.onstart = () => {
+                    this.startTime = performance.now() / 1000;
+                    this.updateProgress();
+                };
+
+                this.utterance.onend = () => {
+                    this.isPlaying = false;
+                    this.playPauseButton.textContent = 'Play';
+                    cancelAnimationFrame(this.animationFrameId);
+                };
+
+                this.utterance.onpause = () => {
+                    this.elapsedTime += (performance.now() / 1000) - this.startTime;
+                    cancelAnimationFrame(this.animationFrameId);
+                };
+
+                this.utterance.onresume = () => {
+                    this.startTime = performance.now() / 1000;
+                    this.updateProgress();
+                };
+            }
+
+            togglePlayPause() {
+                if (!this.utterance) {
+                    this.createUtterance();
+                }
+
+                if (this.isPlaying) {
+                    speechSynthesis.pause();
+                } else {
+                    if (speechSynthesis.paused) {
+                        speechSynthesis.resume();
+                    } else {
+                        speechSynthesis.speak(this.utterance);
+                    }
+                }
+                this.isPlaying = !this.isPlaying;
+                this.playPauseButton.textContent = this.isPlaying ? 'Pause' : 'Play';
+            }
+
+            updateVoice() {
+                if (this.isPlaying) {
+                    this.stop();
+                    this.createUtterance();
+                    this.togglePlayPause();
+                }
+            }
+
+            updateRate() {
+                if (this.utterance) {
+                    this.utterance.rate = parseFloat(this.rateInput.value);
+                }
+            }
+
+            updatePitch() {
+                if (this.utterance) {
+                    this.utterance.pitch = parseFloat(this.pitchInput.value);
+                }
+            }
+
+            toggleTextVisibility() {
+                this.isTextVisible = !this.isTextVisible;
+                this.audioTextElement.style.display = this.isTextVisible ? 'block' : 'none';
+                this.toggleButton.textContent = this.isTextVisible ? 'Hide Text' : 'Show Text';
+            }
+
+            updateProgress() {
+                if (this.utterance) {
+                    const currentTime = this.elapsedTime + (performance.now() / 1000) - this.startTime;
+                    this.totalDuration = this.utterance.text.length * 0.05; // Estimate duration
+                    const progress = (currentTime / this.totalDuration) * 100;
+                    this.progress.value = progress;
+
+                    this.updateTimeDisplay(currentTime);
+
+                    if (this.isPlaying) {
+                        this.animationFrameId = requestAnimationFrame(() => this.updateProgress());
+                    }
+                }
+            }
+
+            updateTimeDisplay(currentTime) {
+                this.currentTimeDisplay.textContent = this.formatTime(currentTime);
+                this.durationDisplay.textContent = this.formatTime(this.totalDuration);
+            }
+
+            formatTime(time) {
+                const minutes = Math.floor(time / 60);
+                const seconds = Math.floor(time % 60);
+                return `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+            }
+
+            rewind() {
+                if (this.utterance) {
+                    this.stop();
+                    this.elapsedTime = Math.max(0, this.elapsedTime - 10);
+                    this.createUtterance();
+                    if (this.isPlaying) {
+                        this.togglePlayPause();
+                    }
+                }
+            }
+
+            forward() {
+                if (this.utterance) {
+                    this.stop();
+                    this.elapsedTime = Math.min(this.totalDuration, this.elapsedTime + 10);
+                    this.createUtterance();
+                    if (this.isPlaying) {
+                        this.togglePlayPause();
+                    }
+                }
+            }
+
+            stop() {
+                speechSynthesis.cancel();
+                this.isPlaying = false;
+                this.playPauseButton.textContent = 'Play';
+                cancelAnimationFrame(this.animationFrameId);
+            }
+        }
+
+        // Initialize the audio player
+        const player = new AudioPlayer();
+
+        // Handle page unload
+        window.addEventListener('beforeunload', () => {
+            if (player) {
+                player.stop();
+            }
+        });
+    </script>
+</body>
+</html>
